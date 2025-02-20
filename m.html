@@ -1,0 +1,209 @@
+<!-- Frontend Code {main.html} -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Healthcare Chatbot</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+<style>
+    body {
+    width: 100%;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+header {
+    background-color: #0078d7;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.chat-container {
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+    width: 60%;
+    height: 60vh;
+    margin: 50px auto;
+    background: white;
+    border-radius: 2%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    width: 60%;
+    height: 4.8vh;
+    text-align: center;
+    background-color: #0078d7;
+    color: white;
+    text-align: center;
+    padding-top: 0.8rem;
+    position: fixed;
+    border-radius: 3%;
+}
+
+.chat-body {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 21rem;
+    border-bottom: 0.5rem solid #ddd;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+.message {
+    border-radius: 0.8rem;
+    word-wrap: break-word;
+    letter-spacing: 0.1rem;
+}
+
+.user-message {
+    background-color: rgb(97, 97, 97);
+    padding: 1rem;
+    margin: 0.2rem;
+    color: white;
+    display: flex;
+    align-self: flex-end;
+    text-align: end;
+    transition-duration: 0.35s;
+    transition-property: all;
+}
+.user-message:hover{
+    box-shadow: 0 0 0.6rem rgb(159, 159, 159);
+    transform: scale(1.003);
+}
+
+.bot-message {
+    background-color: white;
+    padding: 1rem;
+    margin: 0.4rem;
+    color: black;
+    display: flex;
+    align-self: flex-start;
+    text-align: left;
+    transition-duration: 0.35s;
+    transition-property: all;
+}
+.bot-message:hover{
+    box-shadow: 0 0 0.6rem rgb(211, 211, 211);
+}
+
+.chat-footer {
+    width: 59%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    top: 75vh;
+    position: fixed;
+    padding: 8px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.chat-footer button {
+    padding: 10px;
+    border: none;
+    background-color: #0078d7;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.chat-footer button:hover {
+    background-color: #0059ff;
+}
+
+</style>
+<body>
+    <header>
+        <h1>AI Healthcare Chatbot</h1>
+    </header>
+    <div class="chat-container" id="form1">
+        <div class="chat-header">How can I assist you today?</div>
+        <div class="chat-body" id="chatBody"></div>
+        <form class="chat-footer">
+            <input type="text" id="userInput" name="userInput" placeholder="Ask your health-related question...">
+            <button id="sendButton" type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', async()=>{
+            await fetch('https://sambanova-ai-fastapi.onrender.com/',{
+                method:'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            await fetch('https://sambanova-ai-fastapi.onrender.com/',{
+                method:'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+        })
+
+        document.getElementById('form1').addEventListener('submit', handleUserMessage);
+
+        function handleUserMessage(event) {
+            event.preventDefault()
+            const userInput = document.getElementById('userInput');
+            const userMessage = userInput.value.trim();
+
+            if (userMessage) {
+                displayMessage(userMessage, 'user-message');
+
+                // Send message to the backend
+                fetch('https://sambanova-ai-fastapi.onrender.com/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({'userInput':userMessage+''}),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        displayMessage(data+'', 'bot-message');
+                    })
+                    .catch(error => {
+                        displayMessage('Sorry, something went wrong.', 'bot-message');
+                        console.error('Error:', error);
+                    });
+
+                userInput.value = '';
+        }
+    }
+
+    function displayMessage(message, className) {
+        const chatBody = document.getElementById('chatBody');
+        const messageElement = document.createElement('div');
+        messageElement.className = `message: ${className}`;
+        messageElement.textContent = message;
+        chatBody.appendChild(messageElement);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    </script>
+</body>
+</html>
