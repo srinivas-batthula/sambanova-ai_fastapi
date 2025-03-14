@@ -138,7 +138,7 @@ header {
 </style>
 <body>
     <header>
-        <h1>AI Healthcare Chatbot</h1>
+        <h1>Test Chatbot</h1>
     </header>
     <div class="chat-container" id="form1">
         <div class="chat-header">How can I assist you today?</div>
@@ -157,12 +157,12 @@ header {
                     'Content-Type': 'application/json'
                 },
             })
-            await fetch('https://sambanova-ai-fastapi.onrender.com/',{
-                method:'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
+            // await fetch('https://sambanova-ai-fastapi.onrender.com/',{
+            //     method:'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            // })
         })
 
         document.getElementById('form1').addEventListener('submit', handleUserMessage);
@@ -176,7 +176,7 @@ header {
                 displayMessage(userMessage, 'user-message');
 
                 // Send message to the backend
-                fetch('https://sambanova-ai-fastapi.onrender.com/chatbot', {
+                fetch('https://sambanova-ai-fastapi.onrender.com/verseify_ai', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
