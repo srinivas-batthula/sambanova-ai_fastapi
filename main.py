@@ -50,17 +50,15 @@ def test():
 
 # Verseify-Chatbot Route
 @app.post("/verseify_ai")
-async def fetch(q: str = 'false', request: ChatRequest):
+async def fetch(request: ChatRequest, q: str = 'false'):
     try:
         client = get_openai_client()
         
         system_message = ""
-        if(q=='false'){
-            system_message = "You are an AI assistant for a blogging site ~Verseify developed by Srinivas. Now give the response in a normal format as like how chatgpt gives... {Note: Do not give it in format of title or hashtags or content, etc}."
-        }
-        else{
+        if(q=='false'):
+            system_message = "You are an AI assistant for a blogging site ~Verseify developed by Srinivas Batthula. Now give the response in a normal format as like how chatgpt, gemini, etc gives... {/Note: Do not give it in format of title or hashtags or content, etc/}, AtLast, Ask a question to engage the user."
+        else:
             system_message = "You are an AI-powered blog assistant for the platform ~Verseify (developed by Srinivas Batthula). Given a topic, generate an **SEO-friendly 5-word title**, **4 trending and keyword-rich hashtags**, and a **10-word engaging blog content snippet** in separate blocks **(strictly, provide the response only in this specified format only, but AtLast, Ask a question to engage the user)**,,,    with real-world and current updates on the topic given by the user. Ensure content is relevant, fresh, and attention-grabbing."
-        }
 
         response = client.chat.completions.create(
             model="Meta-Llama-3.1-8B-Instruct",
@@ -73,20 +71,20 @@ async def fetch(q: str = 'false', request: ChatRequest):
         )
         
                                                 # Do these Conversions at the Frontend-Side....
-        # Extract title
-        title_match = re.search(r'\*\*SEO-friendly 5-word title:\*\* "(.*?)"', response.choices[0].message.content)
-        title = title_match.group(1) if title_match else None
+                    # Extract title
+        # title_match = re.search(r'\*\*SEO-friendly 5-word title:\*\* "(.*?)"', response.choices[0].message.content)
+        # title = title_match.group(1) if title_match else None
 
-        # Extract hashtags
-        hashtags_list = re.findall(r'#\w+', response.choices[0].message.content)
-        hashtags = " ".join(hashtags_list)
+                    # Extract hashtags
+        # hashtags_list = re.findall(r'#\w+', response.choices[0].message.content)
+        # hashtags = " ".join(hashtags_list)
 
-        # Extract content snippet
-        content_match = re.search(r'\*\*10-word engaging blog content snippet:\*\* "(.*?)"', response.choices[0].message.content)
-        content = content_match.group(1) if content_match else None
+                    # Extract content snippet
+        # content_match = re.search(r'\*\*10-word engaging blog content snippet:\*\* "(.*?)"', response.choices[0].message.content)
+        # content = content_match.group(1) if content_match else None
 
 
-        return {"response": response.choices[0].message.content, "hashtags": hashtags, "content": content, 'title': title}
+        return {"response": response.choices[0].message.content}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
