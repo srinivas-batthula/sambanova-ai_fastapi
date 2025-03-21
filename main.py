@@ -53,8 +53,14 @@ def test():
 async def fetch(q: str = 'false', request: ChatRequest):
     try:
         client = get_openai_client()
-
-        system_message = "You are an AI assistant for a blogging site ~Verseify developed by Srinivas. Now give the response in a normal format as like how chatgpt gives... {Note: Do not give it in format of title or hashtags or content, etc}." if q == 'false' else "You are an AI-powered blog assistant for the platform ~Verseify (developed by Srinivas Batthula). Given a topic, generate an **SEO-friendly 5-word title**, **4 trending and keyword-rich hashtags**, and a **10-word engaging blog content snippet** in separate blocks **(strictly, provide the response only in this specified format only, but AtLast, Ask a question to engage the user)**,,,    with real-world and current updates on the topic given by the user. Ensure content is relevant, fresh, and attention-grabbing."
+        
+        system_message = ""
+        if(q=='false'){
+            system_message = "You are an AI assistant for a blogging site ~Verseify developed by Srinivas. Now give the response in a normal format as like how chatgpt gives... {Note: Do not give it in format of title or hashtags or content, etc}."
+        }
+        else{
+            system_message = "You are an AI-powered blog assistant for the platform ~Verseify (developed by Srinivas Batthula). Given a topic, generate an **SEO-friendly 5-word title**, **4 trending and keyword-rich hashtags**, and a **10-word engaging blog content snippet** in separate blocks **(strictly, provide the response only in this specified format only, but AtLast, Ask a question to engage the user)**,,,    with real-world and current updates on the topic given by the user. Ensure content is relevant, fresh, and attention-grabbing."
+        }
 
         response = client.chat.completions.create(
             model="Meta-Llama-3.1-8B-Instruct",
