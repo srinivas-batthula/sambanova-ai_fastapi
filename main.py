@@ -4,7 +4,13 @@ import openai
 import os
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import re
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.extension import Limiter
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
+
 
 
 # Load environment variables
@@ -12,6 +18,17 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI()
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Please try again later."}
+    )
+
 
 # Enable CORS (Allow all origins, for testing purposes)
 app.add_middleware(
@@ -50,7 +67,8 @@ def test():
 
 # Verseify-Chatbot Route
 @app.post("/verseify_ai")
-async def fetch(request: ChatRequest, q: str = 'false'):
+@limiter.limit("5/minute")  # 5 requests per minute per IP
+async def fetch(request: Request, data: ChatRequest, q: str = 'false'):
     try:
         client = get_openai_client()
         
@@ -64,25 +82,11 @@ async def fetch(request: ChatRequest, q: str = 'false'):
             model="Meta-Llama-3.1-8B-Instruct",
             messages=[
                 {"role": "system", "content": system_message},
-                {"role": "user", "content": request.userInput}
+                {"role": "user", "content": data.userInput}
             ],
             temperature=0.1,
             top_p=0.1
         )
-        
-                                                # Do these Conversions at the Frontend-Side....
-                    # Extract title
-        # title_match = re.search(r'\*\*SEO-friendly 5-word title:\*\* "(.*?)"', response.choices[0].message.content)
-        # title = title_match.group(1) if title_match else None
-
-                    # Extract hashtags
-        # hashtags_list = re.findall(r'#\w+', response.choices[0].message.content)
-        # hashtags = " ".join(hashtags_list)
-
-                    # Extract content snippet
-        # content_match = re.search(r'\*\*10-word engaging blog content snippet:\*\* "(.*?)"', response.choices[0].message.content)
-        # content = content_match.group(1) if content_match else None
-
 
         return {"response": response.choices[0].message.content}
 
