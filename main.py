@@ -67,7 +67,7 @@ def test():
 
 # Verseify-Chatbot Route
 @app.post("/verseify_ai")
-@limiter.limit("5/minute")  # 5 requests per minute per IP
+@limiter.limit("6/minute")  # 6 requests per minute per IP
 async def fetch(request: Request, data: ChatRequest, q: str = 'false'):
     try:
         client = get_openai_client()
